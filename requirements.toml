@@ -1,0 +1,77 @@
+# Drive requirements — single source of truth.
+# Every requirement must be verified by at least one test marked @pytest.mark.req("REQ-xx").
+# The traceability matrix (reports/traceability.md) is generated from this file on every test run.
+#
+# Default configuration the values refer to:
+#   max speed 3000 rpm, ramp-up/down 2.0 s (0 -> 3000 rpm), OFF3 ramp 0.5 s,
+#   current limit 15 A, overcurrent trip 20 A, overspeed trip 3300 rpm, rated load 1.0 N*m
+
+[REQ-01]
+title = "Setpoint limiting"
+text = "The speed setpoint shall be limited to +/- maximum speed (3000 rpm)."
+category = "Functional"
+
+[REQ-02]
+title = "Ramp-up timing"
+text = "When accelerating, the speed shall follow the ramp-function generator: reaching 99 % of the setpoint no earlier than 95 % and no later than 100 % of the ramp time + 0.2 s, where ramp time = |delta n| / n_max * t_up."
+category = "Performance"
+
+[REQ-03]
+title = "Overshoot"
+text = "Speed overshoot after a ramped setpoint change shall not exceed 1 % of the setpoint."
+category = "Performance"
+
+[REQ-04]
+title = "Steady-state accuracy"
+text = "In steady state the speed error shall be <= 0.1 % of maximum speed (3 rpm), with no load and with rated load."
+category = "Performance"
+
+[REQ-05]
+title = "Load disturbance rejection"
+text = "A rated-load torque step at 1500 rpm shall cause a speed dip of at most 100 rpm, and the speed shall be back within +/- 10 rpm within 0.2 s."
+category = "Performance"
+
+[REQ-06]
+title = "Current limit"
+text = "Motor current shall not exceed the current limit (15 A) by more than 2 % in any normal operation, including setpoint steps without ramp and a locked rotor. A locked rotor shall not cause an overcurrent trip."
+category = "Protection"
+
+[REQ-07]
+title = "Reversing"
+text = "A reversal from +1500 to -1500 rpm shall complete within the ramp time (2.0 s) + 0.3 s without any fault."
+category = "Functional"
+
+[REQ-08]
+title = "OFF1 normal stop"
+text = "OFF1 shall decelerate along the ramp-down time to standstill and then switch off the pulses (state READY). Stopping time from n: n / n_max * t_down + 0.3 s at most."
+category = "Functional"
+
+[REQ-09]
+title = "OFF3 fast stop"
+text = "OFF3 shall decelerate along the OFF3 ramp (0.5 s) to standstill and switch off the pulses, faster than OFF1. OFF3 shall take priority over an active OFF1."
+category = "Safety"
+
+[REQ-10]
+title = "OFF2 coast stop"
+text = "OFF2 shall switch off the output voltage within one control cycle; motor current shall reach 0 A within 5 ms and the motor shall coast without braking torque."
+category = "Safety"
+
+[REQ-11]
+title = "Overcurrent protection"
+text = "If |I| exceeds 20 A the drive shall trip with fault F01 within 1 ms, switch off the pulses and the current shall decay to 0 A within 5 ms."
+category = "Protection"
+
+[REQ-12]
+title = "Overspeed protection"
+text = "If |n| exceeds 3300 rpm (e.g. driven by an overhauling load) the drive shall trip with fault F02 and switch off the pulses."
+category = "Protection"
+
+[REQ-13]
+title = "Fault latching and acknowledge"
+text = "A fault shall stay latched: ON commands are rejected while in FAULT. Acknowledge shall be rejected while the fault cause is still present, and accepted afterwards, returning the drive to READY."
+category = "Protection"
+
+[REQ-14]
+title = "No automatic restart"
+text = "After any stop (OFF1, OFF2, OFF3) or acknowledged fault, the drive shall remain stopped with a non-zero setpoint until a new ON command is given."
+category = "Safety"
